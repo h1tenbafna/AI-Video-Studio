@@ -260,8 +260,10 @@ class TestConfig:
         assert config.checkpoint.policy.value == "guided"
 
     def test_load_from_yaml(self):
+        # Studio fork: config.yaml is a hard $0 cap (upstream shipped 10.0).
         config = OpenMontageConfig.load()
-        assert config.budget.total_usd == 10.0
+        assert config.budget.total_usd == 0.0
+        assert config.budget.mode.value == "cap"
 
 
 # ---- Schemas ----

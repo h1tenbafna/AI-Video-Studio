@@ -548,6 +548,11 @@ class ImageSelector(BaseTool):
     def _tool_selectable(self, tool: BaseTool, inputs: dict[str, Any]) -> bool:
         """A provider is selectable if it is AVAILABLE, or if it can serve a
         caller-supplied custom workflow even while bundled models report DEGRADED."""
+        # A provider's own get_status_for() hook must not bypass the spend policy.
+        from lib.spend_policy import blocked_reason
+
+        if blocked_reason(tool) is not None:
+            return False
         status_for = getattr(tool, "get_status_for", None)
         status = status_for(inputs) if status_for else tool.get_status()
         if status == ToolStatus.AVAILABLE:

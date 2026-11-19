@@ -40,6 +40,18 @@ class BudgetConfig(BaseModel):
     require_approval_for_new_paid_tool: bool = True
 
 
+class SpendPolicyMode(str, Enum):
+    LOCAL_ONLY = "local_only"
+    OFF = "off"
+
+
+class SpendPolicyConfig(BaseModel):
+    """Local-only spend policy (see lib/spend_policy.py). Defaults fail closed."""
+
+    mode: SpendPolicyMode = SpendPolicyMode.LOCAL_ONLY
+    allow_tools: list[str] = Field(default_factory=list)
+
+
 class CheckpointConfig(BaseModel):
     policy: CheckpointPolicy = CheckpointPolicy.GUIDED
     storage_dir: str = "pipeline"
@@ -67,6 +79,7 @@ class OpenMontageConfig(BaseModel):
 
     llm: LLMConfig = Field(default_factory=LLMConfig)
     budget: BudgetConfig = Field(default_factory=BudgetConfig)
+    spend_policy: SpendPolicyConfig = Field(default_factory=SpendPolicyConfig)
     checkpoint: CheckpointConfig = Field(default_factory=CheckpointConfig)
     output: OutputConfig = Field(default_factory=OutputConfig)
     paths: PathsConfig = Field(default_factory=PathsConfig)

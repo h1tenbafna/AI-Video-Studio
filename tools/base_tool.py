@@ -408,6 +408,49 @@ def _cache_execute(fn: Callable) -> Callable:
     return wrapper
 
 
+def _spend_guard_execute(fn: Callable) -> Callable:
+    """Refuse to run a tool the local-only spend policy blocks (lib/spend_policy).
+
+    Outermost wrapper: a blocked paid tool never reaches the cache, the event
+    stream or the network, and never silently reroutes to another tool.
+    """
+    if getattr(fn, "_spend_guarded", False):
+        return fn
+
+    @functools.wraps(fn)
+    def wrapper(self, inputs: Any, *args: Any, **kwargs: Any):
+        from lib.spend_policy import blocked_reason
+
+        reason = blocked_reason(self)
+        if reason is not None:
+            return ToolResult(
+                success=False,
+                error=f"spend_policy_blocked: {self.name}: {reason}",
+                data={"error_class": "spend_policy_blocked", "tool": self.name},
+            )
+        return fn(self, inputs, *args, **kwargs)
+
+    wrapper._spend_guarded = True  # type: ignore[attr-defined]
+    return wrapper
+
+
+def _spend_guard_status(fn: Callable) -> Callable:
+    """Report a policy-blocked tool as UNAVAILABLE so nothing selects it."""
+    if getattr(fn, "_spend_guarded", False):
+        return fn
+
+    @functools.wraps(fn)
+    def wrapper(self, *args: Any, **kwargs: Any):
+        from lib.spend_policy import blocked_reason
+
+        if blocked_reason(self) is not None:
+            return ToolStatus.UNAVAILABLE
+        return fn(self, *args, **kwargs)
+
+    wrapper._spend_guarded = True  # type: ignore[attr-defined]
+    return wrapper
+
+
 class BaseTool(ABC):
     """Abstract base class for all OpenMontage tools."""
 
@@ -416,9 +459,15 @@ class BaseTool(ABC):
         super().__init_subclass__(**kwargs)
         impl = cls.__dict__.get("execute")
         if impl is not None and not getattr(impl, "__isabstractmethod__", False):
-            # Cache is outermost: a hit skips both the live call and its event
-            # emission. Instrumentation wraps the raw implementation beneath it.
-            cls.execute = _cache_execute(_instrument_execute(impl))
+            # Spend guard is outermost, then the cache: a hit skips both the
+            # live call and its event emission. Instrumentation wraps the raw
+            # implementation beneath it.
+            cls.execute = _spend_guard_execute(
+                _cache_execute(_instrument_execute(impl))
+            )
+        status_impl = cls.__dict__.get("get_status")
+        if status_impl is not None:
+            cls.get_status = _spend_guard_status(status_impl)
 
     # --- Identity (override in subclasses) ---
     name: str = ""
@@ -481,6 +530,10 @@ class BaseTool(ABC):
 
     def get_status(self) -> ToolStatus:
         """Check if this tool's dependencies are satisfied."""
+        from lib.spend_policy import blocked_reason
+
+        if blocked_reason(self) is not None:
+            return ToolStatus.UNAVAILABLE
         try:
             self.check_dependencies()
             return ToolStatus.AVAILABLE

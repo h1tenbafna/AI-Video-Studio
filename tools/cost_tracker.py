@@ -61,12 +61,50 @@ class CostTracker:
         if cost_log_path and cost_log_path.exists():
             self._load()
 
+    @classmethod
+    def from_config(
+        cls, cost_log_path: Optional[Path] = None, config: Any = None
+    ) -> "CostTracker":
+        """Build a tracker from config.yaml. Config is authoritative: a saved
+        cost log can never raise the budget above what config allows."""
+        from lib.config_model import OpenMontageConfig
+
+        # Fail closed: an unreadable config, a missing `budget` section, or a
+        # budget field left unset means hard $0 cap, never the permissive
+        # BudgetConfig defaults ($10, warn).
+        try:
+            cfg = config or OpenMontageConfig.load()
+            b = cfg.budget
+            explicit = (
+                b.model_fields_set if "budget" in cfg.model_fields_set else set()
+            )
+        except Exception:
+            b, explicit = None, set()
+
+        def pick(field: str, default: Any) -> Any:
+            return getattr(b, field) if b is not None and field in explicit else default
+
+        tracker = cls(
+            budget_total_usd=pick("total_usd", 0.0),
+            reserve_pct=pick("reserve_pct", 0.0),
+            single_action_approval_usd=pick("single_action_approval_usd", 0.0),
+            require_approval_for_new_paid_tool=pick(
+                "require_approval_for_new_paid_tool", True
+            ),
+            mode=pick("mode", BudgetMode.CAP),
+            cost_log_path=cost_log_path,
+        )
+        tracker.budget_total_usd = pick("total_usd", 0.0)
+        return tracker
+
     # ---- Budget calculations ----
 
     @property
     def budget_reserved_usd(self) -> float:
+        # Negative amounts (a corrupt or hand-edited saved log) never count as
+        # credit: they must not be able to raise the remaining budget.
         return sum(
-            e.get("reserved_usd", 0.0)
+            max(0.0, e.get("reserved_usd", 0.0))
             for e in self.entries
             if e["status"] == EntryStatus.RESERVED.value
         )
@@ -74,7 +112,7 @@ class CostTracker:
     @property
     def budget_spent_usd(self) -> float:
         return sum(
-            e.get("actual_usd", 0.0)
+            max(0.0, e.get("actual_usd", 0.0))
             for e in self.entries
             if e["status"] in (EntryStatus.COMPLETED.value, EntryStatus.FAILED.value)
         )
@@ -123,6 +161,18 @@ class CostTracker:
         entry = self._find(entry_id)
         self._require_status(entry, EntryStatus.ESTIMATED, "reserve")
         estimated = entry["estimated_usd"]
+
+        # Hard cap: with a cap-mode budget, a priced action beyond what remains
+        # is refused outright. Approval cannot override it (so a $0 cap means $0).
+        if (
+            self.mode == BudgetMode.CAP
+            and estimated > 0
+            and estimated > self.budget_remaining_usd
+        ):
+            raise BudgetExceededError(
+                f"Hard cap: ${estimated:.2f} exceeds remaining budget "
+                f"${self.budget_remaining_usd:.2f} (mode=cap)"
+            )
 
         # Check single-action approval threshold
         if estimated > self.single_action_approval_usd:

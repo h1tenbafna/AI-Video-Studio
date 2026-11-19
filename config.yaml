@@ -6,12 +6,21 @@ llm:
   temperature: 0.7
   max_tokens: 4096
 
+# Studio fork: external spend is $0 (Claude Pro is the only paid service).
 budget:
-  mode: warn                     # observe | warn | cap
-  total_usd: 10.00
-  reserve_pct: 0.10              # holdback for retries / cleanup
-  single_action_approval_usd: 0.50
+  mode: cap                      # observe | warn | cap
+  total_usd: 0.00                # hard $0: any priced action is refused
+  reserve_pct: 0.0
+  single_action_approval_usd: 0.0
   require_approval_for_new_paid_tool: true
+
+# Only local tools may run. api-runtime tools and non-selector hybrids are
+# blocked (and reported unavailable) unless listed here, with user approval.
+# bg_remove is the local rembg tool (hybrid runtime). threejs_asset_catalog was
+# reviewed 2026-11-19: free CC0 packs from kenney.nl only, no key, no billing.
+spend_policy:
+  mode: local_only               # local_only | off
+  allow_tools: [bg_remove, threejs_asset_catalog]   # catalog: free CC0 kenney.nl packs, no key
 
 checkpoint:
   policy: guided                 # guided | manual_all | auto_noncreative

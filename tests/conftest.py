@@ -111,6 +111,84 @@ def _block_network():
         socket.create_connection = _real_create_connection
 
 
+# Legacy test modules that run paid-provider tools against mocked transports.
+# The local-only spend policy blocks those tools by design, so ONLY these modules
+# get the policy switched off. Every other test (including all of
+# tests/tools/test_spend_policy.py) runs against the real policy.
+# Derived 2026-11-19 from a full run under the real policy: each module below
+# passes with the policy off and fails only because it drives a paid/hybrid
+# tool (mocked transport). Add a module only if it needs a mocked paid provider.
+_PAID_PROVIDER_MOCK_MODULES: frozenset[str] = frozenset({
+    "test_3d_asset_generation",
+    "test_atlas_tools",
+    "test_atlas_video",
+    "test_azure_stt",
+    "test_azure_tts",
+    "test_base_tool_cache",
+    "test_corpus_builder_path_traversal",
+    "test_corpus_builder_total_failure",
+    "test_dashscope_tools",
+    "test_documentary_governance",
+    "test_elevenlabs_timestamps",
+    "test_fal_elevenlabs_music",
+    "test_fal_elevenlabs_tts",
+    "test_fal_resume_output_format",
+    "test_fish_audio_tts",
+    "test_freesound_music",
+    "test_gemini_omni_video",
+    "test_google_imagen_gemini_backend",
+    "test_google_imagen_multi_output",
+    "test_google_tts_scoped_key",
+    "test_google_tts_voice_id_alias",
+    "test_google_vertex_backends",
+    "test_hunyuan_cloud_video",
+    "test_hunyuan_image",
+    "test_image_selector_hooks",
+    "test_inworld_tts",
+    "test_jimeng_video",
+    "test_kling_o3_fal_video",
+    "test_kling_official_avatar",
+    "test_kling_official_image",
+    "test_kling_official_video",
+    "test_kling_tts",
+    "test_minicut_media",
+    "test_minicut_sfx",
+    "test_minicut_upscale",
+    "test_minimax_image",
+    "test_minimax_video",
+    "test_new_video_model_support",
+    "test_openai_image_multi_output",
+    "test_phase3_contracts",
+    "test_pika_video",
+    "test_pixabay_music_retry",
+    "test_pixabay_per_page_clamp",
+    "test_provider_oct23",
+    "test_provider_refresh",
+    "test_schema_media_native_references",
+    "test_seedance_ark_video",
+    "test_seedream_image",
+    "test_sora_video",
+    "test_stock_provider_detection",
+})
+
+
+@pytest.fixture(autouse=True)
+def _spend_policy_for_tests(request):
+    from lib import spend_policy
+
+    module = request.module.__name__.rsplit(".", 1)[-1]
+    if module in _PAID_PROVIDER_MOCK_MODULES:
+        spend_policy.set_policy_override(spend_policy.SpendPolicy(mode="off"))
+    else:
+        spend_policy.set_policy_override(None)
+        spend_policy.reset_policy()
+    try:
+        yield
+    finally:
+        spend_policy.set_policy_override(None)
+        spend_policy.reset_policy()
+
+
 def pytest_configure(config):
     config.addinivalue_line(
         "markers",
