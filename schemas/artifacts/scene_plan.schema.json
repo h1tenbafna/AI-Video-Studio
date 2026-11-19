@@ -89,6 +89,36 @@
               "additionalProperties": false
             }
           },
+          "production": {
+            "type": "object",
+            "description": "Optional per-scene production decision. 'route' is the asset technology for this scene; the composition runtime (remotion/hyperframes/ffmpeg) is a project-level choice and is not set here.",
+            "required": ["route"],
+            "properties": {
+              "route": {
+                "type": "string",
+                "enum": ["blender", "threejs", "manim", "remotion", "cinematic", "hybrid"],
+                "description": "Asset technology used to make this scene"
+              },
+              "style_id": {
+                "type": "string",
+                "description": "Id of a style card in styles/library/ (original specs)"
+              },
+              "execution_tool": {
+                "type": "string",
+                "description": "Registered tool name that will render this scene, if already chosen"
+              },
+              "rationale": {
+                "type": "string",
+                "description": "Why this route and style fit the scene"
+              },
+              "estimated_render_seconds": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Estimate only, not a measurement"
+              }
+            },
+            "additionalProperties": false
+          },
           "texture_keywords": {
             "type": "array",
             "items": { "type": "string" },
