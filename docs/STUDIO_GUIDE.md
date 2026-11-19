@@ -11,8 +11,11 @@ rendered here) or **estimate** (my judgment, not measured).
 - **Cost:** $0 external spend. Only your Claude Pro subscription is paid. Paid tools are blocked in code (`config.yaml`, `lib/spend_policy.py`).
 - **Verified here:** one 30 s vertical (1080x1920, 30 fps) video, "Sunlight to Electricity", made with Blender (3D scenes), Remotion
   (text, captions, composition), Piper (voice), ffmpeg (encode). Final: -13.9 LUFS, 98.1% speech-to-text match to the script.
-- **Untested here:** Three.js, Manim, HyperFrames, and every style card in `styles/library/`.
-- **Not possible locally:** AI-generated video or photoreal images (4 GB VRAM is too small), and any music generator or stock-music API.
+- **Small test renders passed 2026-11-20** (evidence in `projects/_route_tests/`): Manim (480p, 3.6 s, plain text, no LaTeX) and Three.js world via
+  HyperFrames (720p, 4 s, **blockout tier**, dim low-poly look). These prove the route works, not that it looks premium.
+- **Still untested here:** every style card as a finished look, Three.js at production tier (needs the Kenney packs), `diagram_gen`, long renders.
+- **Not possible locally:** AI-generated video or photoreal images (4 GB VRAM is too small).
+- **Music:** needs a decision, see section 2. No music tool is allowed yet.
 - **Machine limits:** 4 GB VRAM, 7.8 GB RAM, small C: drive. Keep files on D:. Encode with libx264. Remotion concurrency 2.
 
 ## 2. One-time setup checklist (about 10 minutes)
@@ -68,8 +71,8 @@ The **composition runtime** (Remotion or HyperFrames) is one project-level choic
 | Friendly stories, history, people | blender or remotion | `paper-cutout-diorama` | untested card; Blender verified |
 | Step-by-step process, cause and effect | blender or threejs | `tabletop-miniature` | untested card |
 | How a system is built | threejs, blender, remotion | `blueprint-isometric` | untested card |
-| Maths, logic, proofs | manim or remotion | `chalkboard-derivation` | untested; no LaTeX installed |
-| Tech, networks, high energy | threejs or blender | `night-city-neon` | untested; heavy on 4 GB VRAM |
+| Maths, logic, proofs | manim or remotion | `chalkboard-derivation` | Manim route test passed (matches the card palette); no LaTeX |
+| Tech, networks, high energy | threejs or blender | `night-city-neon` | Three.js route test passed (blockout world); card look untested; heavy on 4 GB VRAM |
 
 Rules of thumb:
 - **First time using a route or card: make a 10-15 second test scene before the full video.**
@@ -150,4 +153,5 @@ Long-form uses `youtube_landscape` (1920x1080, 30 fps). Avoid 4K on this machine
 - No error messages in `events.jsonl`; failures are counted by tool.
 - Skill scripts that call paid APIs can bypass the code guard (`bgm.mjs`, `lyria-recipe.py`, `locate.mjs`, `kling_official_animated_explainer_e2e.py`). They are never run here.
 - ComfyUI "local" workflows could use paid partner nodes; not installed.
-- Style cards and Three.js/Manim/HyperFrames routes are untested until you render them.
+- Style cards stay `untested` as finished looks until one is rendered for real. Routes Manim, Three.js (blockout) and HyperFrames passed small tests.
+- Three.js world tool had a bug (bare `three` import broke renders); fixed in `tools/graphics/templates/threejs_world/index.html` with an import map.

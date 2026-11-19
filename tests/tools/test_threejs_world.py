@@ -241,3 +241,12 @@ def test_video_compose_routes_empty_cut_atelier_to_existing_workspace(tmp_path, 
     assert captured["operation"] == "render_existing"
     assert captured["asset_manifest"] == {"version": "1.0", "assets": []}
     assert captured["edit_decisions"]["cuts"] == []
+
+
+def test_world_template_maps_bare_three_import():
+    """GLTFLoader from jsDelivr imports bare 'three'; without an importmap the page errors and the render fails."""
+    from pathlib import Path
+
+    tpl = Path(__file__).resolve().parents[2] / "tools/graphics/templates/threejs_world/index.html"
+    html = tpl.read_text(encoding="utf-8")
+    assert 'type="importmap"' in html and '"three"' in html

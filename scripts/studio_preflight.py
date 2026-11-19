@@ -27,7 +27,9 @@ sys.path.insert(0, str(ROOT))
 # Tools the verified routes need (Blender, Remotion/ffmpeg composition, Piper narration, captions).
 REQUIRED_TOOLS = ["piper_tts", "video_compose", "subtitle_gen", "audio_mixer", "transcriber", "blender_world", "visual_qa"]
 # Untested here: report availability but never claim they work.
-UNTESTED_TOOLS = ["threejs_world", "math_animate", "hyperframes_compose", "diagram_gen"]
+# Rendered a small test here on 2026-11-20 (see projects/_route_tests/). Low-res / blockout proof, not a quality guarantee.
+TESTED_SMALL = {"threejs_world": "blockout 720p 4s", "math_animate": "Manim 480p 3.6s, plain text (no LaTeX)", "hyperframes_compose": "rendered the Three.js test"}
+UNTESTED_TOOLS = ["diagram_gen"]
 MIN_FREE_GB = {"C": 1.0, "D": 20.0}
 
 
@@ -55,11 +57,13 @@ def check() -> list[dict]:
         from tools.base_tool import ToolStatus
         from tools.tool_registry import registry
         registry.discover()
-        for name in REQUIRED_TOOLS + UNTESTED_TOOLS:
+        for name in REQUIRED_TOOLS + list(TESTED_SMALL) + UNTESTED_TOOLS:
             tool = registry._tools.get(name)
             status = tool.get_status() if tool else None
             ok = status == ToolStatus.AVAILABLE
-            if name in REQUIRED_TOOLS:
+            if name in TESTED_SMALL:
+                rows.append(_row("OK" if ok else "FAIL", f"tool {name}", ("available; small test rendered: " + TESTED_SMALL[name]) if ok else f"status={status}"))
+            elif name in REQUIRED_TOOLS:
                 rows.append(_row("OK" if ok else "FAIL", f"tool {name}", "available (not proof it renders)" if ok else f"status={status}"))
             else:
                 rows.append(_row("WARN", f"tool {name}", ("available" if ok else f"status={status}") + "; UNTESTED on this machine"))

@@ -8,6 +8,7 @@ Credit: the card structure (Look / Motion / Light / Camera / Good for) is inspir
 shown on Futurepedia. The specs here are written from scratch; nothing is copied.
 
 Card frontmatter: `id` (= filename), `name`, `routes` (allowed `production.route` values), `status`.
-`status: untested` means nobody has rendered this card on this machine. Update it to `verified` only after a render.
+`status: untested` means nobody has rendered this card as a finished look on this machine. Update it to `verified` only after a real render.
+Route-level small tests (2026-11-20) passed for manim, threejs (blockout) and hyperframes, so every route a card names has rendered at least once; that is not the same as the card looking right.
 
 Cards: blueprint-isometric, paper-cutout-diorama, tabletop-miniature, chalkboard-derivation, clean-data-motion, night-city-neon.
