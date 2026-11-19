@@ -33,6 +33,12 @@ Chat, questions and repo work do not need the guide. Only production work does.
 - Machine limits (4 GB VRAM, 7.8 GB RAM, small C: drive) are in auto-memory. Check them before choosing heavy local routes.
 - Keep large files on D:. Prefer libx264. Keep Remotion concurrency at 2.
 
+## Studio helpers
+- Skills: `studio` (stage loop), `route-and-style` (per-scene route + `styles/library/` card), `cost-and-qa`.
+- `python scripts/studio_preflight.py` before a production (read-only readiness check). `python scripts/studio_report.py <id>` after.
+- No music source works under the $0 policy: music comes from tracks the user drops in `music_library/`, or none. Say so at proposal.
+- User guide: `docs/STUDIO_GUIDE.md`.
+
 ## Discover capabilities (do not scan the repo)
 ```bash
 export PATH="$PWD/.venv/Scripts:$PATH"   # needed or piper_tts and math_animate show "unavailable"
