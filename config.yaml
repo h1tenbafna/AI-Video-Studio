@@ -20,7 +20,7 @@ budget:
 # reviewed 2026-11-19: free CC0 packs from kenney.nl only, no key, no billing.
 spend_policy:
   mode: local_only               # local_only | off
-  allow_tools: [bg_remove, threejs_asset_catalog]   # catalog: free CC0 kenney.nl packs, no key
+  allow_tools: [bg_remove, threejs_asset_catalog, pixabay_music, freesound_music]   # catalog: free CC0 kenney.nl packs. pixabay_music (scrapes site, free) + freesound_music (official free API, needs key): user-approved 2026-11-20
 
 checkpoint:
   policy: guided                 # guided | manual_all | auto_noncreative

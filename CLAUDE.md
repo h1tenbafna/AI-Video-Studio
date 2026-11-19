@@ -36,7 +36,7 @@ Chat, questions and repo work do not need the guide. Only production work does.
 ## Studio helpers
 - Skills: `studio` (stage loop), `route-and-style` (per-scene route + `styles/library/` card), `cost-and-qa`.
 - `python scripts/studio_preflight.py` before a production (read-only readiness check). `python scripts/studio_report.py <id>` after.
-- No music source works under the $0 policy: music comes from tracks the user drops in `music_library/`, or none. Say so at proposal.
+- Music ($0): `pixabay_music` (free; scrapes the site, can 403/break, user-approved 2026-11-20), `freesound_music` (official free API, needs a user-created `FREESOUND_API_KEY`), or tracks in `music_library/`. Local ACE-Step is NOT installed (needs CUDA 12.8; driver is 522). Present the music plan at proposal and let the user pick.
 - User guide: `docs/STUDIO_GUIDE.md`.
 
 ## Discover capabilities (do not scan the repo)
