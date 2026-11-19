@@ -64,8 +64,16 @@ def _sha256(path: Path) -> str:
 
 def _download(url: str, destination: Path) -> None:
     request = urllib.request.Request(url, headers={"User-Agent": "OpenMontage/threejs-asset-catalog"})
-    with urllib.request.urlopen(request, timeout=120) as response, destination.open("wb") as output:
-        shutil.copyfileobj(response, output)
+    partial = destination.with_suffix(destination.suffix + ".part")
+    try:
+        with urllib.request.urlopen(request, timeout=120) as response, partial.open("wb") as output:
+            shutil.copyfileobj(response, output)
+        # A stale or gated link returns an HTML page, not an archive. Never keep it.
+        if not zipfile.is_zipfile(partial):
+            raise ValueError("the server did not return a zip archive (stale or gated download link)")
+        partial.replace(destination)
+    finally:
+        partial.unlink(missing_ok=True)
 
 
 class ThreeJSAssetCatalog(BaseTool):
@@ -98,6 +106,10 @@ class ThreeJSAssetCatalog(BaseTool):
         "properties": {
             "operation": {"type": "string", "enum": ["list", "install", "inspect"]},
             "catalog_id": {"type": "string"},
+            "expected_sha256": {
+                "type": "string",
+                "description": "Pin the archive: install refuses to extract on mismatch.",
+            },
             "output_path": {"type": "string"},
         },
     }
@@ -135,8 +147,25 @@ class ThreeJSAssetCatalog(BaseTool):
         source = CATALOGS[catalog_id]
         root.mkdir(parents=True, exist_ok=True)
         archive = root / f"{catalog_id}.zip"
+        manual = (
+            f"Download {source['title']} yourself from {source['source_url']} "
+            f"(the site's 'Continue without donating' button; kenney.nl blocks scripted "
+            f"downloads) and save it as {archive}, then run install again."
+        )
         if not archive.exists():
-            _download(source["download_url"], archive)
+            try:
+                _download(source["download_url"], archive)
+            except (ValueError, OSError) as exc:
+                return ToolResult(success=False, error=f"Could not download {catalog_id}: {exc}. {manual}")
+        if not zipfile.is_zipfile(archive):
+            return ToolResult(success=False, error=f"{archive} is not a valid zip archive; replace it. {manual}")
+        digest = _sha256(archive)
+        expected = (params.get("expected_sha256") or source.get("sha256") or "").lower()
+        if expected and digest != expected:
+            return ToolResult(
+                success=False,
+                error=f"Archive sha256 {digest} does not match pinned {expected}; nothing extracted.",
+            )
         extract_root = root / "source"
         if not extract_root.exists():
             extract_root.mkdir(parents=True)
@@ -155,7 +184,8 @@ class ThreeJSAssetCatalog(BaseTool):
             "version": "1.0",
             "catalog_id": catalog_id,
             **source,
-            "archive_sha256": _sha256(archive),
+            "archive_sha256": digest,
+            "sha256_pinned": bool(expected),
             "model_count": len(models),
             "texture_count": len(textures),
             "models": [
