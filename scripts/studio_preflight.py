@@ -1,0 +1,123 @@
+#!/usr/bin/env python
+"""Read-only readiness check for a first (or next) production on this machine.
+
+Usage:  python scripts/studio_preflight.py [--json]
+
+Makes NO network calls, calls NO providers, installs nothing and writes nothing.
+It reports three separate things and never mixes them up:
+  OK    = verified present right now (file exists, tool reports AVAILABLE, policy loaded)
+  WARN  = works but limited, or needs a manual step from you
+  FAIL  = a required piece is missing
+"Tool AVAILABLE" means policy allows it and its dependencies are present. It is NOT proof it renders.
+Proof only comes from a real render (see docs/STUDIO_GUIDE.md).
+Exit code 1 if any FAIL.
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
+
+# Tools the verified routes need (Blender, Remotion/ffmpeg composition, Piper narration, captions).
+REQUIRED_TOOLS = ["piper_tts", "video_compose", "subtitle_gen", "audio_mixer", "transcriber", "blender_world", "visual_qa"]
+# Untested here: report availability but never claim they work.
+UNTESTED_TOOLS = ["threejs_world", "math_animate", "hyperframes_compose", "diagram_gen"]
+MIN_FREE_GB = {"C": 1.0, "D": 20.0}
+
+
+def _row(level: str, item: str, detail: str) -> dict:
+    return {"level": level, "item": item, "detail": detail}
+
+
+def check() -> list[dict]:
+    rows: list[dict] = []
+
+    # 1. $0 policy
+    try:
+        from lib.config_model import OpenMontageConfig
+        from lib.spend_policy import get_policy
+        cfg, pol = OpenMontageConfig.load(), get_policy()
+        if cfg.budget.total_usd == 0 and pol.enforced:
+            rows.append(_row("OK", "spend policy", f"mode={pol.mode}, budget cap ${cfg.budget.total_usd}, allow_tools={sorted(pol.allow_tools)}"))
+        else:
+            rows.append(_row("FAIL", "spend policy", f"budget=${cfg.budget.total_usd}, enforced={pol.enforced}; expected $0 and enforced"))
+    except Exception as e:  # fail closed: unreadable config is a failure
+        rows.append(_row("FAIL", "spend policy", f"could not load: {e}"))
+
+    # 2. Tools
+    try:
+        from tools.base_tool import ToolStatus
+        from tools.tool_registry import registry
+        registry.discover()
+        for name in REQUIRED_TOOLS + UNTESTED_TOOLS:
+            tool = registry._tools.get(name)
+            status = tool.get_status() if tool else None
+            ok = status == ToolStatus.AVAILABLE
+            if name in REQUIRED_TOOLS:
+                rows.append(_row("OK" if ok else "FAIL", f"tool {name}", "available (not proof it renders)" if ok else f"status={status}"))
+            else:
+                rows.append(_row("WARN", f"tool {name}", ("available" if ok else f"status={status}") + "; UNTESTED on this machine"))
+        music = registry._tools.get("music_library")
+        n_tracks = len([p for p in (ROOT / "music_library").glob("*") if p.suffix.lower() in {".mp3", ".wav", ".m4a", ".ogg", ".flac"}])
+        if n_tracks:
+            rows.append(_row("OK", "music_library", f"{n_tracks} track(s)"))
+        else:
+            rows.append(_row("WARN", "music_library", "empty. No music source is available under the $0 policy. "
+                             "Drop royalty-free tracks into music_library/ or proceed without music. Check licences yourself."))
+    except Exception as e:
+        rows.append(_row("FAIL", "tool registry", f"could not load: {e}"))
+
+    # 3. Binaries and runtimes
+    ffmpeg = shutil.which("ffmpeg")
+    rows.append(_row("OK" if ffmpeg else "FAIL", "ffmpeg", ffmpeg or "not on PATH (add D:/downloadss/ffmpeg-9.0.2-essentials_build/bin)"))
+    node = shutil.which("node")
+    if node:
+        v = subprocess.run([node, "--version"], capture_output=True, text=True).stdout.strip()
+        rows.append(_row("OK", "node", v))
+    else:
+        rows.append(_row("FAIL", "node", "not found"))
+    blender = next((ROOT / ".runtime/blender").glob("*/blender.exe"), None)
+    rows.append(_row("OK" if blender else "WARN", "blender", str(blender) if blender else "portable Blender not found under .runtime/blender"))
+    rows.append(_row("OK" if (ROOT / "remotion-composer/node_modules").is_dir() else "FAIL", "remotion deps", "remotion-composer/node_modules"))
+    voices = sorted(p.name for p in (Path.home() / ".piper/models").glob("*.onnx"))
+    rows.append(_row("OK" if voices else "FAIL", "piper voices", ", ".join(voices) or "none in ~/.piper/models"))
+
+    # 4. Disk space
+    for drive, need in MIN_FREE_GB.items():
+        try:
+            free = shutil.disk_usage(f"{drive}:/").free / 1e9
+            rows.append(_row("OK" if free >= need else "WARN", f"disk {drive}:", f"{free:.1f} GB free (want >= {need:g})"))
+        except OSError:
+            rows.append(_row("WARN", f"disk {drive}:", "drive not found"))
+
+    # 5. Stray paid keys: informational. They are never used.
+    import os
+    stray = [k for k in ("OPENAI_API_KEY", "GEMINI_API_KEY") if os.environ.get(k)]
+    if stray:
+        rows.append(_row("WARN", "stray keys", f"{', '.join(stray)} present in env; never used here (CLAUDE.md rule)"))
+    return rows
+
+
+def main(argv=None) -> int:
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--json", action="store_true")
+    a = ap.parse_args(argv)
+    rows = check()
+    if a.json:
+        print(json.dumps(rows, indent=2))
+    else:
+        for r in rows:
+            print(f"[{r['level']:<4}] {r['item']:<22} {r['detail']}")
+        counts = {k: sum(r["level"] == k for r in rows) for k in ("OK", "WARN", "FAIL")}
+        print(f"\n{counts['OK']} ok, {counts['WARN']} warn, {counts['FAIL']} fail")
+    return 1 if any(r["level"] == "FAIL" for r in rows) else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
