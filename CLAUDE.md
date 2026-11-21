@@ -30,8 +30,9 @@ Chat, questions and repo work do not need the guide. Only production work does.
   It cannot see skill scripts that call paid APIs directly. The stray `GEMINI_API_KEY` / `OPENAI_API_KEY` stay in place but are never used:
   do not run `hyperframes-media` `bgm.mjs` / `lyria-recipe.py`, `motion-graphics/grounding/locate.mjs`, or `scripts/kling_official_animated_explainer_e2e.py`.
 - "Available" in the registry is not "verified working". Say which one you mean, and say when a route is untested here.
-- Machine limits (4 GB VRAM, 7.8 GB RAM, small C: drive) are in auto-memory. Check them before choosing heavy local routes.
-- Keep large files on D:. Prefer libx264. Keep Remotion concurrency at 2.
+- Machine limits differ per computer. Run `scripts/studio_preflight.py` and ask the user about RAM/GPU before choosing heavy local routes.
+  Original Windows PC: 4 GB VRAM, 7.8 GB RAM, small C: drive. macOS: see `docs/MAC_SETUP.md` (Apple Silicon, no CUDA, skip local video-gen models).
+- Keep large files off a small system drive (Windows: use D:). Prefer libx264. Keep Remotion concurrency at 2.
 
 ## Studio helpers
 - Skills: `studio` (stage loop), `route-and-style` (per-scene route + `styles/library/` card), `cost-and-qa`.
@@ -41,7 +42,7 @@ Chat, questions and repo work do not need the guide. Only production work does.
 
 ## Discover capabilities (do not scan the repo)
 ```bash
-export PATH="$PWD/.venv/Scripts:$PATH"   # needed or piper_tts and math_animate show "unavailable"
+export PATH="$PWD/.venv/bin:$PATH"   # macOS/Linux. Windows Git Bash: .venv/Scripts. Needed or piper_tts and math_animate show "unavailable"
 python -c "from tools.tool_registry import registry; import json; registry.discover(); print(json.dumps(registry.provider_menu_summary(), indent=1))"
 ```
 Use `registry.capability_catalog()` for a family and `registry.provider_menu()` for detail. Do not dump `support_envelope()`.

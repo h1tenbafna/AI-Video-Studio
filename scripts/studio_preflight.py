@@ -30,7 +30,11 @@ REQUIRED_TOOLS = ["piper_tts", "video_compose", "subtitle_gen", "audio_mixer", "
 # Rendered a small test here on 2026-11-20 (see projects/_route_tests/). Low-res / blockout proof, not a quality guarantee.
 TESTED_SMALL = {"threejs_world": "blockout 720p 4s", "math_animate": "Manim 480p 3.6s, plain text (no LaTeX)", "hyperframes_compose": "rendered the Three.js test"}
 UNTESTED_TOOLS = ["diagram_gen"]
+IS_WINDOWS = sys.platform == "win32"
+IS_MAC = sys.platform == "darwin"
+# Free space wanted on the drive that holds the repo (projects, renders, caches). Windows also checks C: (caches live there).
 MIN_FREE_GB = {"C": 1.0, "D": 20.0}
+MIN_FREE_REPO_GB = 20.0
 
 
 def _row(level: str, item: str, detail: str) -> dict:
@@ -79,26 +83,36 @@ def check() -> list[dict]:
 
     # 3. Binaries and runtimes
     ffmpeg = shutil.which("ffmpeg")
-    rows.append(_row("OK" if ffmpeg else "FAIL", "ffmpeg", ffmpeg or "not on PATH (add D:/downloadss/ffmpeg-9.0.2-essentials_build/bin)"))
+    rows.append(_row("OK" if ffmpeg else "FAIL", "ffmpeg", ffmpeg or ("not on PATH (macOS: brew install ffmpeg)" if IS_MAC else "not on PATH (install ffmpeg and add its bin folder to PATH)")))
     node = shutil.which("node")
     if node:
         v = subprocess.run([node, "--version"], capture_output=True, text=True).stdout.strip()
         rows.append(_row("OK", "node", v))
     else:
         rows.append(_row("FAIL", "node", "not found"))
-    blender = next((ROOT / ".runtime/blender").glob("*/blender.exe"), None)
-    rows.append(_row("OK" if blender else "WARN", "blender", str(blender) if blender else "portable Blender not found under .runtime/blender"))
+    from tools.graphics.blender_world import find_blender
+    blender = find_blender()
+    rows.append(_row("OK" if blender else "WARN", "blender", str(blender) if blender else
+                     "not found (only needed for the Blender route). Install Blender 4.5 LTS, set BLENDER_PATH, or unpack under .runtime/blender"))
     rows.append(_row("OK" if (ROOT / "remotion-composer/node_modules").is_dir() else "FAIL", "remotion deps", "remotion-composer/node_modules"))
     voices = sorted(p.name for p in (Path.home() / ".piper/models").glob("*.onnx"))
-    rows.append(_row("OK" if voices else "FAIL", "piper voices", ", ".join(voices) or "none in ~/.piper/models"))
+    rows.append(_row("OK" if voices else "FAIL", "piper voices", ", ".join(voices) or "none in ~/.piper/models (see docs/MAC_SETUP.md or docs/STUDIO_GUIDE.md)"))
+    venv_bin = Path(sys.executable).parent
+    on_path = shutil.which("piper") is not None
+    rows.append(_row("OK" if on_path else "WARN", "venv on PATH",
+                     "piper found" if on_path else f"piper not on PATH. Run: export PATH=\"{venv_bin}:$PATH\" (Windows Git Bash: .venv/Scripts)"))
 
     # 4. Disk space
-    for drive, need in MIN_FREE_GB.items():
+    if IS_WINDOWS:
+        checks = {f"{d}:/": need for d, need in MIN_FREE_GB.items()}
+    else:
+        checks = {str(ROOT): MIN_FREE_REPO_GB}
+    for target, need in checks.items():
         try:
-            free = shutil.disk_usage(f"{drive}:/").free / 1e9
-            rows.append(_row("OK" if free >= need else "WARN", f"disk {drive}:", f"{free:.1f} GB free (want >= {need:g})"))
+            free = shutil.disk_usage(target).free / 1e9
+            rows.append(_row("OK" if free >= need else "WARN", f"disk {target}", f"{free:.1f} GB free (want >= {need:g})"))
         except OSError:
-            rows.append(_row("WARN", f"disk {drive}:", "drive not found"))
+            rows.append(_row("WARN", f"disk {target}", "drive not found"))
 
     # 5. Stray paid keys: informational. They are never used.
     import os

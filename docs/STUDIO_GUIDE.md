@@ -16,12 +16,13 @@ rendered here) or **estimate** (my judgment, not measured).
 - **Still untested here:** every style card as a finished look, Three.js at production tier (needs the Kenney packs), `diagram_gen`, long renders.
 - **Not possible locally:** AI-generated video or photoreal images (4 GB VRAM is too small).
 - **Music:** `pixabay_music` works (one test download passed, 2026-11-20), `freesound_music` needs your free API key, and `music_library/` takes tracks you add. Local music generation (ACE-Step) is not installed, see section 2.
-- **Machine limits:** 4 GB VRAM, 7.8 GB RAM, small C: drive. Keep files on D:. Encode with libx264. Remotion concurrency 2.
+- **Machine limits (original Windows PC):** 4 GB VRAM, 7.8 GB RAM, small C: drive. Keep files on D:. Encode with libx264. Remotion concurrency 2.
 
 ## 2. One-time setup checklist (about 10 minutes)
 
-1. Open a terminal in `D:\AI-Video-Studio\OpenMontage` and run: `python scripts/studio_preflight.py`
-   (use the project `.venv`; in Git Bash run `export PATH="$PWD/.venv/Scripts:$PATH"` first).
+1. Open a terminal in the repo folder and run: `python scripts/studio_preflight.py`
+   (use the project `.venv`; Git Bash on Windows: `export PATH="$PWD/.venv/Scripts:$PATH"`; macOS: `source .venv/bin/activate`).
+   **On a Mac, follow `docs/MAC_SETUP.md` instead** (one script does the whole install).
    Expected today: 0 FAIL. WARNs for untested routes and an empty music folder are normal.
 2. **Music (three working sources):**
    - **Pixabay Music (works now, free, no key).** `pixabay_music` finds and downloads tracks (Pixabay Content License: free, no attribution

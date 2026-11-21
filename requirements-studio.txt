@@ -1,0 +1,10 @@
+# Studio extras: the local ($0) routes verified in this fork.
+# Install after requirements.txt:  pip install -r requirements.txt -r requirements-studio.txt
+piper-tts>=1.3          # local narration (Piper voices)
+faster-whisper>=1.0     # word timings + caption/QA transcription (CPU is fine)
+kokoro-onnx>=0.4        # Kokoro local voice, used through `npx hyperframes tts`
+manim>=0.19             # math_animate / chalkboard route (needs cairo + pango from the OS)
+pydub>=0.25
+soundfile>=0.12
+opencv-python>=4.8
+yt-dlp

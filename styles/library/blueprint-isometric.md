@@ -2,7 +2,7 @@
 id: blueprint-isometric
 name: Blueprint Isometric
 routes: [threejs, blender, remotion]
-status: untested
+status: verified (Remotion atelier, full 40 s vertical render 2026-11-20, project ai-compute-business-explainer)
 ---
 **Look:** Pale-blue technical drawing paper with white linework; objects are flat-shaded isometric solids with thin outlines and small dimension callouts.
 **Motion:** Parts slide in along their axes and snap with a short overshoot; lines draw on before fills appear.

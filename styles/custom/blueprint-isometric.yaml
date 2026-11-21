@@ -1,0 +1,106 @@
+asset_generation:
+  consistency_anchors:
+  - Pale-blue drafting paper (#8FB8E0) background throughout
+  - Navy (#0B2A4A) text and outlines; white linework
+  - 'Orange (#FF7A1A) is the only accent: money flow and key numbers'
+  - Company names shown as numbered PART TAGS with leader lines, never as plain captions
+  - Locked 35-degree isometric view; cuts reframe, never rotate
+  diagram_style: isometric technical drawing, white linework with navy outline, orange
+    money-flow arrows, numbered part tags with leader lines
+  image_negative_prompt: ''
+  image_prompt_prefix: ''
+audio:
+  ducking_threshold_db: -3
+  music_mood: ambient corporate, upbeat but not distracting
+  music_volume: 0.08
+  sfx_style: subtle clicks, soft whooshes on transitions
+  voice_style: professional, clear, moderate pace, warm but authoritative
+chart_palette:
+- '#14508C'
+- '#FF7A1A'
+- '#0B2A4A'
+- '#FFFFFF'
+color_rules:
+  colorblind_safe: true
+  contrast_validation: true
+  harmony_type: analogous
+identity:
+  best_for: 'How a system or money chain is assembled: isometric technical-drawing
+    explainers'
+  category: minimalist
+  mood: precise, curious, drafted by hand
+  name: Blueprint Isometric
+  pace: moderate
+motion:
+  animation_style: lines draw on before fills; parts slide along their axes and snap
+    with a short overshoot
+  entrance: draw-on then snap
+  exit: fade
+  pacing_rules:
+    max_scene_hold_seconds: 20
+    min_scene_hold_seconds: 2.5
+    stat_card_hold_seconds: 3.0
+    text_card_hold_seconds: 3.5
+    transition_duration_seconds: 0.4
+  transitions:
+  - fade
+  - dissolve
+  - slide-left
+overlays:
+  code_block:
+    bg: '#0B2A4A'
+    highlight: '#FF7A1A'
+    text: '#FFFFFF'
+  key_term:
+    bg: '#DCEBF7'
+    radius: 2
+    text: '#0B2A4A'
+  stat_card:
+    bg: '#DCEBF7'
+    border: '#0B2A4A'
+    radius: 2
+    shadow: none
+quality_rules:
+- Minimum contrast ratio 4.5:1 for all text (navy on pale blue)
+- No more than 3 colors on screen at once, excluding paper (navy, white, orange)
+- 'Text readable on a phone: tag labels at least 36 px at 1080x1920'
+- 'Every company name is a part tag: leader line draws on, then label'
+- Hold each beat at least 2.5s
+- Orange is for shapes, arrows and chips on navy only; never orange text on the pale-blue
+  paper (contrast about 1.3:1)
+typography:
+  body:
+    font: Space Grotesk
+    line_height: 1.6
+    weight: 400
+  code:
+    font: JetBrains Mono
+    weight: 400
+  headings:
+    font: Space Grotesk
+    tracking: -0.02em
+    weight: 700
+  scale_system: major_third
+  stat_card:
+    font: Inter
+    size_multiplier: 3.0
+    weight: 800
+  weight_matrix:
+    body: 400
+    caption: 400
+    heading: 700
+    title: 800
+visual_language:
+  color_palette:
+    accent:
+    - '#FF7A1A'
+    background: '#8FB8E0'
+    muted: '#3E6A99'
+    primary:
+    - '#0B2A4A'
+    - '#14508C'
+    text: '#0B2A4A'
+  composition: locked 35-degree isometric grid, drafting-sheet border with title block,
+    generous margins for 1080x1920
+  texture: faint paper grain, white linework with navy outlines for legibility, flat
+    fills

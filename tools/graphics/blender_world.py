@@ -24,18 +24,43 @@ from tools.base_tool import (
 
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
-_PORTABLE_BLENDER = (
-    _REPO_ROOT / ".runtime" / "blender" / "blender-4.5.10-windows-x64" / "blender.exe"
+_PORTABLE_ROOT = _REPO_ROOT / ".runtime" / "blender"
+# Blender executable locations, relative to an extracted portable folder or an install root.
+_BLENDER_RELATIVE = (
+    "blender.exe",                          # Windows portable zip
+    "blender",                              # Linux tarball
+    "Blender.app/Contents/MacOS/Blender",   # macOS dmg copied into the folder
+    "Contents/MacOS/Blender",               # macOS: folder is the .app itself
+)
+_SYSTEM_BLENDER = (
+    Path("/Applications/Blender.app/Contents/MacOS/Blender"),            # macOS
+    Path.home() / "Applications/Blender.app/Contents/MacOS/Blender",     # macOS, per user
 )
 _RUNTIME_SCRIPT = Path(__file__).resolve().parent / "templates" / "blender-world-runtime.py"
 
 
+def _portable_candidates() -> list[Path]:
+    if not _PORTABLE_ROOT.is_dir():
+        return []
+    found: list[Path] = []
+    for folder in sorted(_PORTABLE_ROOT.iterdir(), reverse=True):
+        for rel in _BLENDER_RELATIVE:
+            candidate = folder / rel
+            if candidate.is_file():
+                found.append(candidate)
+    return found
+
+
 def find_blender() -> Path | None:
+    """Locate Blender: BLENDER_PATH, then .runtime/blender (any OS), then system install, then PATH."""
     configured = os.environ.get("BLENDER_PATH")
     if configured and Path(configured).is_file():
         return Path(configured).resolve()
-    if _PORTABLE_BLENDER.is_file():
-        return _PORTABLE_BLENDER.resolve()
+    for candidate in _portable_candidates():
+        return candidate.resolve()
+    for candidate in _SYSTEM_BLENDER:
+        if candidate.is_file():
+            return candidate.resolve()
     discovered = shutil.which("blender")
     return Path(discovered).resolve() if discovered else None
 
@@ -62,8 +87,9 @@ class BlenderWorld(BaseTool):
     runtime = ToolRuntime.LOCAL_GPU
     dependencies: list[str] = []
     install_instructions = (
-        "Install Blender 4.5 LTS, set BLENDER_PATH, or place the portable runtime at "
-        ".runtime/blender/blender-4.5.10-windows-x64/blender.exe."
+        "Install Blender 4.5 LTS (macOS: Blender.app in /Applications), set BLENDER_PATH, or "
+        "unpack a portable build under .runtime/blender/<folder>/ (blender.exe on Windows, "
+        "Blender.app on macOS)."
     )
     agent_skills = [
         "3d-asset-generation", "threejs-world-generation", "threejs-loaders", "threejs-materials",
