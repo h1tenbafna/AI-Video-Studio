@@ -4,7 +4,8 @@ import { C, FONT, clamp, eo, prog } from "./lib";
 import { WORDS } from "./words";
 
 // ---------- Drafting sheet: paper, grid, border, title block, grain ----------
-export const Sheet: React.FC = () => (
+// title: the title-block label (keep it short, about 16 characters, upper case). Default = the original AI-compute sheet.
+export const Sheet: React.FC<{ title?: string; sheet?: string }> = ({ title = "AI COMPUTE CHAIN", sheet = "SHEET 1/1  REV A" }) => (
   <AbsoluteFill style={{ backgroundColor: C.paper }}>
     <svg width={1080} height={1920} style={{ position: "absolute", inset: 0 }}>
       <defs>
@@ -28,8 +29,8 @@ export const Sheet: React.FC = () => (
       <g transform="translate(676 1812)">
         <rect width={368} height={72} fill={C.tag} stroke={C.navy} strokeWidth={3} />
         <line x1={0} y1={36} x2={368} y2={36} stroke={C.navy} strokeWidth={2} />
-        <text x={14} y={27} fontFamily={FONT} fontWeight={700} fontSize={22} fill={C.navy} letterSpacing={2}>AI COMPUTE CHAIN</text>
-        <text x={14} y={61} fontFamily={FONT} fontWeight={500} fontSize={22} fill={C.mid} letterSpacing={2}>SHEET 1/1  REV A</text>
+        <text x={14} y={27} fontFamily={FONT} fontWeight={700} fontSize={22} fill={C.navy} letterSpacing={2}>{title}</text>
+        <text x={14} y={61} fontFamily={FONT} fontWeight={500} fontSize={22} fill={C.mid} letterSpacing={2}>{sheet}</text>
       </g>
     </svg>
   </AbsoluteFill>
@@ -144,7 +145,7 @@ export const StepRail: React.FC<{ time: number; ys: number[]; lit: number[]; lab
 };
 
 // ---------- Boxed dimension callout (big figure, small label, orange underline) ----------
-export const Callout: React.FC<{ x: number; y: number; w: number; t: number; big?: string; small: string[]; foot?: string; bigSize?: number }> = ({ x, y, w, t, big, small, foot, bigSize = 84 }) => {
+export const Callout: React.FC<{ x: number; y: number; w: number; t: number; big?: string; small: string[]; foot?: string; bigSize?: number; footSize?: number }> = ({ x, y, w, t, big, small, foot, bigSize = 84, footSize = 28 }) => {
   const a = eo(prog(t, 0, 0.5));
   const u = eo(prog(t, 0.4, 0.5));
   return (
@@ -154,7 +155,7 @@ export const Callout: React.FC<{ x: number; y: number; w: number; t: number; big
       {small.map((s, i) => (
         <div key={i} style={{ fontSize: 36, fontWeight: 600, lineHeight: "44px" }}>{s}</div>
       ))}
-      {foot && <div style={{ fontSize: 28, fontWeight: 500, color: C.mid, marginTop: 6 }}>{foot}</div>}
+      {foot && <div style={{ fontSize: footSize, fontWeight: 500, color: C.mid, marginTop: 6 }}>{foot}</div>}
     </div>
   );
 };
@@ -178,8 +179,8 @@ export const Legend: React.FC<{ x: number; y: number; t: number }> = ({ x, y, t 
 };
 
 // ---------- Captions: blueprint strip, word by word, active word as a navy chip ----------
-type W = { word: string; startMs: number; endMs: number };
-const buildPages = (words: W[]) => {
+export type W = { word: string; startMs: number; endMs: number };
+export const buildPages = (words: W[]) => {
   const pages: W[][] = [];
   let cur: W[] = [];
   let chars = 0;
@@ -197,9 +198,11 @@ const buildPages = (words: W[]) => {
   if (cur.length) pages.push(cur);
   return pages;
 };
-const PAGES = buildPages(WORDS);
+const DEFAULT_PAGES = buildPages(WORDS);
 
-export const Captions: React.FC<{ bottom?: number }> = ({ bottom = 108 }) => {
+// words: word timings for a new episode (Whisper on the narration timeline). Default = the original words.ts.
+export const Captions: React.FC<{ bottom?: number; words?: W[] }> = ({ bottom = 108, words }) => {
+  const PAGES = React.useMemo(() => (words ? buildPages(words) : DEFAULT_PAGES), [words]);
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const ms = (frame / fps) * 1000;
