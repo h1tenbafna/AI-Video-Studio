@@ -2,7 +2,8 @@
 id: paper-cutout-diorama
 name: Paper Cutout Diorama
 routes: [blender, remotion]
-status: untested
+status: verified
+evidence: Remotion paper kit, 46.5 s vertical, relationships-as-insurance-stats, 2026-11-21; user chose the v3 cut; full render about 26 min because of SVG filters
 ---
 **Look:** Layered card cutouts with visible paper fibre and rounded edges, stacked a few centimetres apart in a shallow box.
 **Motion:** Layers drift at different speeds for parallax; pieces pop up on a stepped, slightly uneven rhythm like stop-motion.

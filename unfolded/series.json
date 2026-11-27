@@ -1,0 +1,51 @@
+{
+  "name": "Unfolded",
+  "promise": "The stories behind everything.",
+  "status": "v1 (2026-11-27): painted storybook keyframes (local SD, style C) + code-animated actions + 2.5D depth motion. Blender felt kit kept only as a fallback.",
+  "look": {
+    "route": "local Stable Diffusion keyframes (unfolded/gen/keyframe.py, DreamShaper 8) -> 2.5D depth motion (unfolded/gen/motion.py) -> Remotion for actions, captions, assembly",
+    "style_block": "storybook illustration, painterly digital painting, soft brush texture, warm glowing light, cinematic composition, rich colors, detailed background",
+    "negative_block": "text, watermark, logo, signature, letters, blurry, lowres, jpeg artifacts, deformed, disfigured, extra fingers, bad anatomy, bad hands, ugly, creepy, uncanny",
+    "settings": {
+      "model": "Lykon/dreamshaper-8",
+      "width": 512,
+      "height": 896,
+      "steps": 22,
+      "cfg": 6.5,
+      "scheduler": "DPM++ 2M Karras",
+      "ip_weight": "ip-adapter-plus-face_sd15.safetensors",
+      "ip_scale": 0.6
+    }
+  },
+  "signature_device": "THE UNFOLD: every episode opens with a folded sheet opening along creases into the scene and closes by folding shut over the end card.",
+  "mascot": {
+    "name": "Crease",
+    "description": "original folded-paper creature: diamond body, two ear flaps, bead eyes, one crease smile; watches from the corner and reacts at beats"
+  },
+  "captions": {
+    "style": "B Energy: bold ~76 px, 2 lines, active word honey-gold, dark teal outline, y about 1290"
+  },
+  "voice": "Kokoro af_heart",
+  "music": "warm playful instrumental, ducked; user picks from 3 candidates per episode",
+  "rules": [
+    "every shot shows the narrated action",
+    "shot change every 2-3 s",
+    "generic paper/felt figures labelled by role, never real-person likenesses",
+    "facts sourced and cited"
+  ],
+  "cast": {
+    "method": "text description (fixed per character) + IP-Adapter Plus FACE SD1.5 at scale 0.6 fed with the approved reference portrait. The general Plus adapter copies the reference pose (tested at 0.55 and 0.3) and is NOT used for action shots.",
+    "characters": {
+      "silver": {
+        "role": "Spencer Silver, 3M scientist (generic figure, not a likeness)",
+        "description_file": "unfolded/cast/silver.txt",
+        "reference": "unfolded/cast/silver.png"
+      },
+      "fry": {
+        "role": "Art Fry, 3M scientist (generic figure, not a likeness)",
+        "description_file": "unfolded/cast/fry.txt",
+        "reference": "unfolded/cast/fry.png"
+      }
+    }
+  }
+}

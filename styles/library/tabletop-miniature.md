@@ -2,7 +2,8 @@
 id: tabletop-miniature
 name: Tabletop Miniature
 routes: [blender, threejs]
-status: untested
+status: verified
+evidence: Blender + Remotion overlay, 40 s vertical, project ai-compute-explainer-v2, 2026-11-20; heavy on 4 GB VRAM
 ---
 **Look:** A small scene on a wooden table: matte clay-like models, tilt-shift blur at top and bottom of frame, small labels on tiny flags.
 **Motion:** Pieces are placed by an unseen hand: lift, travel in an arc, settle with a tiny bounce.

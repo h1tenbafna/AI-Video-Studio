@@ -12,6 +12,8 @@ metadata:
 
 # Video Toolkit
 
+> **Repo note (2026-11-25):** paths such as `lib/transitions/` and `lib/components/` come from the upstream toolkit and are not in this repo. Use `@remotion/transitions` and `remotion-composer/src/components/` here.
+
 Create professional explainer videos from a text brief. The toolkit uses open-source AI models on cloud GPUs (Modal or RunPod) for voiceover, image generation, music, and talking head animation. Remotion (React) handles composition and rendering.
 
 ## CRITICAL: Toolkit Path

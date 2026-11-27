@@ -116,3 +116,7 @@ pytest-of-*/
 
 # GFPGAN/facexlib download face-detection weights to ./gfpgan/weights at runtime
 gfpgan/
+
+# Third-party reference reels and decks (local only)
+video-dir/
+AI_Builders_Make_a_Reel_Together_21Nov2026.pptx

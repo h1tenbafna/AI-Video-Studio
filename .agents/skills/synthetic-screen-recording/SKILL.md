@@ -173,8 +173,8 @@ The pattern generalizes. When you need to fake another UI surface (Claude Code c
 
 - `.agents/skills/remotion` — general Remotion authoring (hooks, springs, sequences)
 - `.agents/skills/playwright-recording` — real browser-flow capture for web apps
-- `tools/capture/screen_recorder` — ffmpeg-based desktop capture
-- `tools/capture/cap_recorder` — Cap.so polished desktop capture
+- `tools/capture/screen_recorder.py` — ffmpeg-based desktop capture
+- `tools/capture/cap_recorder.py` — Cap.so polished desktop capture
 - `skills/pipelines/screen-demo/asset-director.md` — chooses between synthetic and real for a screen-demo project
 
 ## Provenance

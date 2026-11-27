@@ -1,0 +1,23 @@
+{
+ "model": "Lykon/dreamshaper-8",
+ "style": "storybook illustration, painterly digital painting, soft brush texture, warm glowing light, cinematic composition, rich colors, detailed background",
+ "negative": "text, watermark, logo, signature, letters, blurry, lowres, jpeg artifacts, deformed, disfigured, extra fingers, bad anatomy, bad hands, ugly, creepy, uncanny",
+ "width": 512,
+ "height": 896,
+ "steps": 22,
+ "cfg": 6.5,
+ "shots": [
+  {
+   "id": "silver_ref_21",
+   "prompt": "character portrait, a kind man in his 40s, short dark brown hair, round wire-rimmed glasses, clean-shaven, white lab coat over a light blue shirt and brown tie, waist up, facing the viewer, gentle smile, standing in a 1960s laboratory with wooden shelves",
+   "seed": 21,
+   "out": "D:/AI-Video-Studio/OpenMontage/unfolded/cast/silver_ref_21.png"
+  },
+  {
+   "id": "silver_ref_22",
+   "prompt": "character portrait, a kind man in his 40s, short dark brown hair, round wire-rimmed glasses, clean-shaven, white lab coat over a light blue shirt and brown tie, waist up, facing the viewer, gentle smile, standing in a 1960s laboratory with wooden shelves",
+   "seed": 22,
+   "out": "D:/AI-Video-Studio/OpenMontage/unfolded/cast/silver_ref_22.png"
+  }
+ ]
+}

@@ -12,3 +12,5 @@ Card frontmatter: `id` (= filename), `name`, `routes` (allowed `production.route
 Route-level small tests (2026-11-20) passed for manim, threejs (blockout) and hyperframes, so every route a card names has rendered at least once; that is not the same as the card looking right.
 
 Cards: blueprint-isometric, paper-cutout-diorama, tabletop-miniature, chalkboard-derivation, clean-data-motion, night-city-neon.
+
+Status update 2026-11-24: five cards now have a finished render (see each card's status line). `clean-data-motion` is still untested as a card.

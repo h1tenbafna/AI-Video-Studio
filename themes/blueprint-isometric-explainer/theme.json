@@ -1,0 +1,17 @@
+{
+  "name": "blueprint-isometric-explainer",
+  "kind": "look",
+  "saved_from_project": "ai-compute-business-explainer",
+  "note": "Pale-blue drafting sheet, navy lines, orange accent, numbered part tags with leader lines. From the AI-compute explainer (BENCHMARK 1).",
+  "style_card": "blueprint-isometric",
+  "route": "remotion for scenes 1-4 (scene 2 atelier)",
+  "runtime": "remotion",
+  "authoring_mode": "atelier",
+  "voice": "Kokoro af_heart via hyperframes tts",
+  "music": "user_library: pixabay_calm_ambient_tech.mp3",
+  "captions": "Blueprint strip",
+  "kit_paths": [
+    "remotion-composer/src/blueprint"
+  ],
+  "how_to_reuse": "New topic, same look: `apply` this theme to a new project, then the scene plan reuses the kit components and art-direction.md. The topic, script and facts are NEW every time. Anything the user changes stays theirs (locked)."
+}

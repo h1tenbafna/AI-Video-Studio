@@ -5,11 +5,13 @@ description: Toolkit-specific Remotion patterns — custom transitions, shared c
 
 # Remotion — Toolkit Extensions
 
-> **Core Remotion knowledge** lives in `.claude/skills/remotion-official/` (synced from the official [remotion-dev/skills](https://github.com/remotion-dev/skills) repo). This file covers **toolkit-specific** patterns only.
+> **Repo note (2026-11-25):** `lib/transitions/` (and `lib/components/`) come from the upstream toolkit and are not in this repo. Use `@remotion/transitions` and `remotion-composer/src/components/`.
+
+> **Core Remotion knowledge** lives in `.claude/skills/remotion-best-practices/` (synced from the official [remotion-dev/skills](https://github.com/remotion-dev/skills) repo). This file covers **toolkit-specific** patterns only.
 
 ## Shared Components
 
-Reusable video components in `lib/components/`. Import in templates via:
+Reusable video components in `remotion-composer/src/components/`. Import in templates via:
 
 ```tsx
 import { AnimatedBackground, SlideTransition, Label } from '../../../../lib/components';
@@ -30,7 +32,7 @@ import { AnimatedBackground, SlideTransition, Label } from '../../../../lib/comp
 
 ## Custom Transitions
 
-The toolkit includes a transitions library at `lib/transitions/` for scene-to-scene effects beyond the official `@remotion/transitions` package.
+The toolkit includes a transitions library at `lib/transitions/` (upstream toolkit library, NOT in this repo: use `@remotion/transitions` or the components in `remotion-composer/src/components/`) for scene-to-scene effects beyond the official `@remotion/transitions` package.
 
 ### Using TransitionSeries
 

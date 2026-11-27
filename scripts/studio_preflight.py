@@ -30,6 +30,7 @@ REQUIRED_TOOLS = ["piper_tts", "video_compose", "subtitle_gen", "audio_mixer", "
 # Rendered a small test here on 2026-11-20 (see projects/_route_tests/). Low-res / blockout proof, not a quality guarantee.
 TESTED_SMALL = {"threejs_world": "blockout 720p 4s", "math_animate": "Manim 480p 3.6s, plain text (no LaTeX)", "hyperframes_compose": "rendered the Three.js test"}
 UNTESTED_TOOLS = ["diagram_gen"]
+TOOL_NOTES = {"diagram_gen": "tested 2026-11-24: boxes mode CRUDE, mermaid mode BROKEN (no headless browser); draw diagrams in the Remotion kits instead"}
 IS_WINDOWS = sys.platform == "win32"
 IS_MAC = sys.platform == "darwin"
 # Free space wanted on the drive that holds the repo (projects, renders, caches). Windows also checks C: (caches live there).
@@ -70,7 +71,7 @@ def check() -> list[dict]:
             elif name in REQUIRED_TOOLS:
                 rows.append(_row("OK" if ok else "FAIL", f"tool {name}", "available (not proof it renders)" if ok else f"status={status}"))
             else:
-                rows.append(_row("WARN", f"tool {name}", ("available" if ok else f"status={status}") + "; UNTESTED on this machine"))
+                rows.append(_row("WARN", f"tool {name}", ("available" if ok else f"status={status}") + "; " + TOOL_NOTES.get(name, "UNTESTED on this machine")))
         music = registry._tools.get("music_library")
         n_tracks = len([p for p in (ROOT / "music_library").glob("*") if p.suffix.lower() in {".mp3", ".wav", ".m4a", ".ogg", ".flac"}])
         if n_tracks:

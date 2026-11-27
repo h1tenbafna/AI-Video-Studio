@@ -20,6 +20,13 @@ Chat, questions and repo work do not need the guide. Only production work does.
 7. At proposal, present both composition runtimes (Remotion, HyperFrames) when both exist, with a recommendation, and wait for approval.
    Offer authoring mode too: templated or atelier (atelier for hero work).
 
+8. **Bring every scene to life.** Show what the narration says as a literal, visible action, not a static card or caption.
+   "Tap an app" means a thumb taps a button and the cab arrives; "hire a specialist" means the specialist shows up at the door.
+   At scene_plan, every scene description must name a concrete action synced to a narrated word, plus a still-frame check
+   ("does this scene move if I mute it?"). Text-only or still cards are allowed only when deliberate (for example a silent closing card), and must be flagged as such.
+9. **Cite facts.** Every statistic or quote shown or spoken needs a source: a small on-screen source tag (30 px minimum), the URL in
+   `research_brief`, and the source list in the publish caption. Mark anything unverified as UNVERIFIED and do not lock it before the script gate.
+
 ## Cost and safety (this install)
 - **External spend is $0.** Claude Pro is the only paid service. No paid APIs, credits or stock.
   The registry shows `openai_*` and `sora` (stray OPENAI key) and `google_*` / `gemini_*` (GEMINI_API_KEY) as "available".
@@ -35,9 +42,12 @@ Chat, questions and repo work do not need the guide. Only production work does.
 - Keep large files off a small system drive (Windows: use D:). Prefer libx264. Keep Remotion concurrency at 2.
 
 ## Studio helpers
-- Skills: `studio` (stage loop), `route-and-style` (per-scene route + `styles/library/` card), `cost-and-qa`.
+- **`/reel` front door:** `.claude/skills/studio-prompts/reel-flow.md` (style menu from `python scripts/studio_styles.py`, saved themes in `themes/` via `scripts/studio_theme.py save|list|show|apply`, character series, quality bar = the `ai-compute-business-explainer` and `sunlight-to-electricity` projects). Script notes from the AI Builders deck: `script-spine.md`. Alive scenes: `scene-motion.md`. Offer to save the look after the final cut is approved.
+- Skills: `studio` (stage loop), `studio-prompts` (**read at intake and before every stage**: brief, prompt cards, style chooser, stock-via-Chrome, campaigns; user-written fields are locked), `clay-series` (a recurring same-look character series, e.g. clay explainers; kit in `clay/`), `route-and-style` (per-scene route + `styles/library/` card), `cost-and-qa`.
+- `python scripts/studio_routes.py` (what works, with evidence), `scripts/studio_stale.py <id>` (what a change made stale), `scripts/studio_rerender.py <id> --scene sN` (re-render one Remotion scene). Guides: `docs/QUICKSTART_REEL.md`, `docs/REWORK_GUIDE.md`.
 - `python scripts/studio_preflight.py` before a production (read-only readiness check). `python scripts/studio_report.py <id>` after.
 - Music ($0): `pixabay_music` (free; scrapes the site, can 403/break, user-approved 2026-11-20), `freesound_music` (official free API, needs a user-created `FREESOUND_API_KEY`), or tracks in `music_library/`. Local ACE-Step is NOT installed (needs CUDA 12.8; driver is 522). Present the music plan at proposal and let the user pick.
+- Manim LaTeX formulas need MiKTeX on PATH (`D:\MiKTeX\miktexind`, already in the user PATH; in an old shell `export PATH="/d/MiKTeX/miktex/bin/x64:$PATH"`). Verification: `docs/ROUTE_VERIFICATION_2026-11-24.md`, `python scripts/studio_pipeline_check.py`.
 - User guide: `docs/STUDIO_GUIDE.md`.
 
 ## Discover capabilities (do not scan the repo)

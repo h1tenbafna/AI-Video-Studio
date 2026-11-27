@@ -5,6 +5,8 @@ description: AI music generation with ACE-Step 1.5 — background music, vocal t
 
 # ACE-Step 1.5 Music Generation
 
+> **Repo note (2026-11-25):** `tools/music_gen.py` and `tools/sfx.py` belong to the upstream claude-code-video-toolkit and are not in this repo. This skill uses RunPod (paid), so it is unusable under the $0 rule. In OpenMontage use the registry tools (`music_library`, `pixabay_music`, `freesound_music`).
+
 Open-source music generation (MIT license) via `tools/music_gen.py`. Runs on RunPod serverless.
 Requires `RUNPOD_API_KEY` and `RUNPOD_ACESTEP_ENDPOINT_ID` in `.env` (run `--setup` to create endpoint).
 

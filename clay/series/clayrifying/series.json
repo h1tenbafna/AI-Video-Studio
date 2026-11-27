@@ -1,0 +1,17 @@
+{
+ "name": "clayrifying",
+ "brand": "clayrifying",
+ "tagline": "Big ideas, made of clay",
+ "style": {"world": "#f4e9d4", "floor": "#d9b27c", "wall": "#f2b84b"},
+ "caption_y": 1400,
+ "music": "music_library/pixabay_calm_ambient_tech.mp3",
+ "end_lines": ["follow for more", "@clayrifying"],
+ "cast": {
+  "pip":  {"color": "#2bb3a3", "shape": "round", "eyes": 1.05, "accessory": "tuft", "accent": "#e4572e",
+           "role": "curious kid who asks the question",
+           "voice": {"engine": "piper", "model": "en_US-lessac-high", "length_scale": 0.95}},
+  "moss": {"color": "#e4572e", "shape": "tall", "eyes": 0.95, "accessory": "glasses", "accent": "#2b2d42",
+           "role": "calm professor who explains with one image",
+           "voice": {"engine": "piper", "model": "en_GB-alan-medium", "length_scale": 1.0}}
+ }
+}

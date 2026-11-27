@@ -44,6 +44,16 @@ LEFT_IRIS = [468, 469, 470, 471, 472]
 RIGHT_IRIS = [473, 474, 475, 476, 477]
 
 
+def _cascade_path(name: str) -> str:
+    """cv2.data cascade if the wheel ships it (OpenCV 5 wheels do not), else the copy in assets/models/."""
+    import os
+    import cv2
+    p = os.path.join(getattr(cv2.data, "haarcascades", ""), name)
+    if os.path.exists(p):
+        return p
+    return os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "assets", "models", name)
+
+
 class EyeEnhance(BaseTool):
     name = "eye_enhance"
     version = "0.1.0"
@@ -126,8 +136,9 @@ class EyeEnhance(BaseTool):
 
     def _has_mediapipe(self) -> bool:
         try:
-            import mediapipe  # noqa: F401
-            return True
+            import mediapipe as _mp  # noqa: F401
+            # mediapipe >= 0.10.30 removed the legacy `solutions` API this tool uses; fall back to OpenCV then
+            return hasattr(_mp, "solutions")
         except ImportError:
             return False
 
@@ -434,10 +445,10 @@ class EyeEnhance(BaseTool):
         crf = inputs.get("crf", 18)
 
         face_cascade = cv2.CascadeClassifier(
-            cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
+            _cascade_path("haarcascade_frontalface_default.xml")
         )
         eye_cascade = cv2.CascadeClassifier(
-            cv2.data.haarcascades + "haarcascade_eye.xml"
+            _cascade_path("haarcascade_eye.xml")
         )
 
         cap = cv2.VideoCapture(str(input_path))
